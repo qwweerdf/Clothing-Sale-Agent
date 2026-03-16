@@ -3,13 +3,13 @@ from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_redis import RedisConfig, RedisVectorStore
 from langchain_text_splitters import CharacterTextSplitter
 
-from load_api_key import get_api_key
+from utils.load_api_key import get_api_key
 
-loader = TextLoader("data/clothes_data.txt")
+loader = TextLoader("../../data/clothes_qa.txt")
 docs = loader.load()
 get_api_key(llm_type="DASHSCOPE_API_KEY")
 text_splitter = CharacterTextSplitter(
-    chunk_size=450,
+    chunk_size=130,
     chunk_overlap=0,
     separator='\n\n',
     keep_separator=True
@@ -22,7 +22,7 @@ embedding_model = DashScopeEmbeddings(model='text-embedding-v4')
 
 
 config = RedisConfig(
-    index_name="sale-index",
+    index_name="sale-qa-index",
     redis_url='redis://localhost:6379',
 )
 

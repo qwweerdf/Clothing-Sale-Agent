@@ -3,15 +3,10 @@
 # 3. 商品推荐，库存做rag
 # 需要做3个知识库，3个工具
 from langchain_core.tools import tool
-from langchain_qwq import ChatQwen
 
-from sale_presale_retrieval import PresaleRetrieval
+from models.llm import qwen_llm as llm
+from rag.retrieval.sale_presale_retrieval import presale_index_retriever
 
-llm = ChatQwen(
-    model="qwen3.5-27b",
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-    timeout=20
-)
 
 @tool
 def presale_metadata(query: str, referred_item: str) -> str:
@@ -47,8 +42,7 @@ def presale_qa(query: str) -> str:
 
     :return 大模型返回
     """
-    presale_qa = PresaleRetrieval('presale-qa-index')
-    context = presale_qa.invoke(query)
+    context = presale_index_retriever.invoke(query)
     prompt_template = f"""
     你是一个衣物售前客服，请为用户提供物流/配送/退换货政策相关的商品外问题等售前问题答疑服务，
     【相关信息】中会记录了可能相关的qa对供参考，你需要参考这些信息对【用户问题】进行解答
@@ -71,7 +65,7 @@ def presale_recommendation(query: str) -> str:
 
     :return 大模型返回
     """
-    context = PresaleRetrieval().invoke(query)
+    context = presale_index_retriever.invoke(query)
     prompt_template = f"""
     你是一个衣物售前客服，请根据用户问题进行回答，请参考【相关信息】对于【用户问题】进行答疑
     注意：【相关信息】里为衣物信息，如果你认为衣物没有和【用户问题】相关时，请提示用户没有相关的衣物信息
